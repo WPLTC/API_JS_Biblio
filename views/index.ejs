@@ -41,6 +41,65 @@
       opacity: 0.9;
     }
 
+ 
+    .search-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .search-form {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .search-select {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .search-btn {
+      padding: 12px 25px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .search-btn:hover {
+      background: #5a6fd6;
+    }
+
+    .reset-link {
+      display: flex;
+      align-items: center;
+      color: #666;
+      text-decoration: none;
+      font-size: 0.95em;
+    }
+    .reset-link:hover { text-decoration: underline; }
+
+  
     .stats {
       background: white;
       border-radius: 10px;
@@ -55,6 +114,7 @@
       font-size: 1.5em;
     }
 
+    /* CSS GRILLE */
     .books-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -132,6 +192,7 @@
       font-style: italic;
     }
 
+
     .badge {
       display: inline-block;
       padding: 5px 12px;
@@ -141,16 +202,10 @@
       margin-top: 10px;
     }
 
-    .badge-available {
-      background: #10b981;
-      color: white;
-    }
+    .badge-available { background: #10b981; color: white; }
+    .badge-unavailable { background: #ef4444; color: white; }
 
-    .badge-unavailable {
-      background: #ef4444;
-      color: white;
-    }
-
+    
     .empty-state {
       background: white;
       border-radius: 15px;
@@ -165,10 +220,7 @@
       margin-bottom: 15px;
     }
 
-    .empty-state p {
-      color: #666;
-      font-size: 1.1em;
-    }
+    .empty-state p { color: #666; font-size: 1.1em; }
 
     .error-message {
       background: #fee;
@@ -178,6 +230,40 @@
       color: #c33;
       text-align: center;
       margin-bottom: 20px;
+    }
+
+    /* CSS PAGINATION */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .page-btn {
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover {
+      background: #f8f9fa;
+      border-color: #667eea;
+    }
+
+    .page-info {
+      color: #555;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -194,8 +280,32 @@
       </div>
     <% } %>
 
+    <div class="search-container">
+      <form action="/" method="GET" class="search-form">
+        <input 
+          type="text" 
+          name="search" 
+          class="search-input"
+          placeholder="Titre ou nom de l'auteur..." 
+          value="<%= (typeof searchParams !== 'undefined' && searchParams.search) ? searchParams.search : '' %>"
+        >
+        
+        <select name="available" class="search-select">
+          <option value="">Tous les statuts</option>
+          <option value="true" <%= (typeof searchParams !== 'undefined' && searchParams.available === 'true') ? 'selected' : '' %>>Disponible</option>
+          <option value="false" <%= (typeof searchParams !== 'undefined' && searchParams.available === 'false') ? 'selected' : '' %>>Indisponible</option>
+        </select>
+
+        <button type="submit" class="search-btn">Rechercher</button>
+        
+        <% if ((typeof searchParams !== 'undefined' && searchParams.search) || (typeof searchParams !== 'undefined' && searchParams.available)) { %>
+          <a href="/" class="reset-link">Réinitialiser</a>
+        <% } %>
+      </form>
+    </div>
+
     <div class="stats">
-      <h2>Total de livres: <%= totalBooks %></h2>
+      <h2>Total de livres affichés : <%= totalBooks %></h2>
     </div>
 
     <% if (books && books.length > 0) { %>
@@ -234,10 +344,33 @@
           </div>
         <% }); %>
       </div>
+
+      <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% if (currentPage > 1) { %>
+            <a href="/?page=<%= currentPage - 1 %>&search=<%= searchParams.search || '' %>&available=<%= searchParams.available || '' %>" class="page-btn">
+              ← Précédent
+            </a>
+          <% } %>
+
+          <span class="page-info">
+            Page <%= currentPage %> sur <%= totalPages %>
+          </span>
+
+          <% if (currentPage < totalPages) { %>
+            <a href="/?page=<%= currentPage + 1 %>&search=<%= searchParams.search || '' %>&available=<%= searchParams.available || '' %>" class="page-btn">
+              Suivant →
+            </a>
+          <% } %>
+        </div>
+      <% } %>
+
     <% } else { %>
       <div class="empty-state">
-        <h2>📖 Aucun livre disponible</h2>
-        <p>La bibliothèque est vide pour le moment.</p>
+        <h2>📖 Aucun livre trouvé</h2>
+        <p>Essayez de modifier vos critères de recherche.</p>
+        <br>
+        <a href="/" class="search-btn" style="text-decoration: none; font-size: 0.9em;">Voir tous les livres</a>
       </div>
     <% } %>
   </div>

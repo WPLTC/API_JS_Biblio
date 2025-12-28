@@ -9,11 +9,11 @@ dotenv.config()
 
 export async function register(req, res) {
   try {
-    // Validation avec le schéma Zod
+    
     const validatedData = registerSchema.parse(req.body)
     const { email, password } = validatedData
 
-    // Vérifier si l'email existe déjà
+   
     const existingUser = await userModel.findUserByEmail(email)
     if (existingUser) return res.status(400).json({ error: "Email déjà utilisé" })
 
@@ -26,7 +26,10 @@ export async function register(req, res) {
     if (error.name === "ZodError") {
       return res.status(400).json({ 
         error: "donnée invalide", 
-        details: error.errors.map(err => ({ field: err.path.join('.'), message: err.message }))
+        details: error.issues.map(err => ({
+          field: err.path.join('.'),
+          message: err.message
+        }))
       })
     }
     res.status(500).json({ error: error.message })
@@ -35,7 +38,7 @@ export async function register(req, res) {
 
 export async function login(req, res) {
   try {
-    // Validation avec le schéma Zod
+   
     const validatedData = loginSchema.parse(req.body)
     const { email, password } = validatedData
 
@@ -48,7 +51,7 @@ export async function login(req, res) {
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.SECRET_ACCESS_TOKEN,
-      { expiresIn: "10m" }
+      { expiresIn: "1m" }
     )
 
     const refreshToken = jwt.sign(
@@ -86,7 +89,7 @@ export function refresh(req, res) {
     const newToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email },
       process.env.SECRET_ACCESS_TOKEN,
-      { expiresIn: "10m" }
+      { expiresIn: "1m" }
     )
 
     const newRefreshToken = jwt.sign(
