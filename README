@@ -33,3 +33,75 @@ Stack Technique
 Démarrage :
 •	npm run dev
 
+Authentification (/api/auth)
+
+POST /api/auth/register
+•	Description : Inscription d'un nouvel utilisateur.
+•	Body : email password
+
+
+POST /api/auth/login
+•	Description : Connexion d'un utilisateur. Renvoie un Token d'accès et stocke le Refresh Token dans un cookie HttpOnly.
+•	Body : email password 
+
+
+POST /api/auth/refresh
+•	Description : Rafraîchir l'Access Token lorsque celui-ci est expiré.
+•	Requis : Le cookie jwt contenant le refresh token valide.
+
+
+Livres (/api/books)
+
+GET /api/books
+•	Description : Récupérer la liste de tous les livres.
+•	Auth : Non requise
+
+
+GET /api/books/:id
+•	Description : Récupérer les détails d'un livre par son ID.
+•	Auth : Non requise
+
+
+POST /api/books
+•	Description : Ajouter un nouveau livre à la bibliothèque.
+•	Auth : token requis
+
+
+PUT /api/books/ :id
+•	Description : Maj d’un livre
+•	Auth : token requis
+
+
+DELETE /api/books/ :id
+•	Description : Supprimer un livre de la bdd.
+•	Auth : token requis 
+
+
+
+
+Auteurs (/api/authors)
+
+
+GET /api/authors
+•	Description : Récupérer la liste de tous les auteurs.
+•	Auth : Non requise
+
+
+GET /api/authors/:id
+•	Description : Récupérer les détails d'un auteur par son ID.
+•	Auth : Non requise
+
+
+POST /api/authors
+•	Description : Ajouter un nouvel auteur.
+•	Auth : token requis 
+
+
+PUT /api/authors/:id
+•	Description : Mettre à jour les informations d'un auteur.
+•	Auth : token requis 
+
+
+DELETE /api/authors/:id
+•	Description : Supprimer un auteur.
+•	Auth : token requis 
